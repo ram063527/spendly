@@ -1,102 +1,168 @@
-{% extends "base.html" %}
-
-{% block title %}Spendly — Track Every Rupee{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Spendly — Track Every Rupee{%
+endblock %} {% block content %}
 
 <section class="hero">
-    <div class="hero-inner">
-        <div class="hero-badge">
-            <span class="hero-badge-dot"></span>
-            Free to use · No credit card needed
-        </div>
-        <h1 class="hero-title">
-            Track every rupee.<br>
-            <span class="hero-title-accent">Know where it goes.</span>
-        </h1>
-        <p class="hero-subtitle">
-            Spendly helps you log expenses, spot patterns, and stay
-            on budget — without the spreadsheet headache.
-        </p>
-        <div class="hero-actions">
-            <a href="{{ url_for('register') }}" class="btn-primary">Create free account</a>
-            <a href="#" class="btn-ghost">See how it works</a>
-        </div>
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Free to use · No credit card needed
     </div>
-    <div class="hero-visual">
-        <div class="mock-card">
-            <div class="mock-card-dots">
-                <span class="dot dot-red"></span>
-                <span class="dot dot-yellow"></span>
-                <span class="dot dot-green"></span>
-            </div>
-            <div class="mock-stats">
-                <div class="mock-stat">
-                    <span class="mock-stat-label">This month</span>
-                    <span class="mock-stat-value">₹18,240</span>
-                    <span class="mock-stat-change mock-stat-change-up">+12% vs last</span>
-                </div>
-                <div class="mock-stat">
-                    <span class="mock-stat-label">Budget left</span>
-                    <span class="mock-stat-value">₹6,760</span>
-                    <span class="mock-stat-change mock-stat-change-down">43% remaining</span>
-                </div>
-                <div class="mock-stat">
-                    <span class="mock-stat-label">Transactions</span>
-                    <span class="mock-stat-value">34</span>
-                    <span class="mock-stat-change mock-stat-change-neutral">this month</span>
-                </div>
-            </div>
-            <div class="mock-bars">
-                <div class="mock-bar-row">
-                    <span class="mock-cat">Food</span>
-                    <div class="mock-bar-track">
-                        <div class="mock-bar mock-bar-food" style="width: 78%"></div>
-                    </div>
-                </div>
-                <div class="mock-bar-row">
-                    <span class="mock-cat">Travel</span>
-                    <div class="mock-bar-track">
-                        <div class="mock-bar mock-bar-travel" style="width: 60%"></div>
-                    </div>
-                </div>
-                <div class="mock-bar-row">
-                    <span class="mock-cat">Bills</span>
-                    <div class="mock-bar-track">
-                        <div class="mock-bar mock-bar-bills" style="width: 46%"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <h1 class="hero-title">
+      Track every rupee.<br />
+      <span class="hero-title-accent">Know where it goes.</span>
+    </h1>
+    <p class="hero-subtitle">
+      Spendly helps you log expenses, spot patterns, and stay on budget —
+      without the spreadsheet headache.
+    </p>
+    <div class="hero-actions">
+      <a href="{{ url_for('register') }}" class="btn-primary"
+        >Create free account</a
+      >
+      <a href="#" class="btn-ghost" id="how-it-works-btn">See how it works</a>
     </div>
+  </div>
+  <div class="hero-visual">
+    <div class="mock-card">
+      <div class="mock-card-dots">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-yellow"></span>
+        <span class="dot dot-green"></span>
+      </div>
+      <div class="mock-stats">
+        <div class="mock-stat">
+          <span class="mock-stat-label">This month</span>
+          <span class="mock-stat-value">₹18,240</span>
+          <span class="mock-stat-change mock-stat-change-up">+12% vs last</span>
+        </div>
+        <div class="mock-stat">
+          <span class="mock-stat-label">Budget left</span>
+          <span class="mock-stat-value">₹6,760</span>
+          <span class="mock-stat-change mock-stat-change-down"
+            >43% remaining</span
+          >
+        </div>
+        <div class="mock-stat">
+          <span class="mock-stat-label">Transactions</span>
+          <span class="mock-stat-value">34</span>
+          <span class="mock-stat-change mock-stat-change-neutral"
+            >this month</span
+          >
+        </div>
+      </div>
+      <div class="mock-bars">
+        <div class="mock-bar-row">
+          <span class="mock-cat">Food</span>
+          <div class="mock-bar-track">
+            <div class="mock-bar mock-bar-food" style="width: 78%"></div>
+          </div>
+        </div>
+        <div class="mock-bar-row">
+          <span class="mock-cat">Travel</span>
+          <div class="mock-bar-track">
+            <div class="mock-bar mock-bar-travel" style="width: 60%"></div>
+          </div>
+        </div>
+        <div class="mock-bar-row">
+          <span class="mock-cat">Bills</span>
+          <div class="mock-bar-track">
+            <div class="mock-bar mock-bar-bills" style="width: 46%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section class="features">
-    <div class="features-inner">
-        <div class="feature-card">
-            <div class="feature-icon">₹</div>
-            <h3 class="feature-title">Log expenses instantly</h3>
-            <p class="feature-body">Add any expense in seconds. Category, amount, date, description — all in one simple form.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">◎</div>
-            <h3 class="feature-title">Understand your patterns</h3>
-            <p class="feature-body">See exactly where your money goes with category breakdowns and monthly summaries.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">◷</div>
-            <h3 class="feature-title">Filter by time period</h3>
-            <p class="feature-body">View your spending for any date range — last week, last month, or a custom period.</p>
-        </div>
+  <div class="features-inner">
+    <div class="feature-card">
+      <div class="feature-icon">₹</div>
+      <h3 class="feature-title">Log expenses instantly</h3>
+      <p class="feature-body">
+        Add any expense in seconds. Category, amount, date, description — all in
+        one simple form.
+      </p>
     </div>
+    <div class="feature-card">
+      <div class="feature-icon">◎</div>
+      <h3 class="feature-title">Understand your patterns</h3>
+      <p class="feature-body">
+        See exactly where your money goes with category breakdowns and monthly
+        summaries.
+      </p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">◷</div>
+      <h3 class="feature-title">Filter by time period</h3>
+      <p class="feature-body">
+        View your spending for any date range — last week, last month, or a
+        custom period.
+      </p>
+    </div>
+  </div>
 </section>
 
 <section class="cta-section">
-    <div class="cta-inner">
-        <h2 class="cta-title">Ready to take control?</h2>
-        <p class="cta-body">Join thousands of people who track their expenses with Spendly.</p>
-        <a href="{{ url_for('register') }}" class="btn-primary">Create free account</a>
-    </div>
+  <div class="cta-inner">
+    <h2 class="cta-title">Ready to take control?</h2>
+    <p class="cta-body">
+      Join thousands of people who track their expenses with Spendly.
+    </p>
+    <a href="{{ url_for('register') }}" class="btn-primary"
+      >Create free account</a
+    >
+  </div>
 </section>
 
+<div class="modal-overlay" id="how-it-works-modal" hidden>
+  <div class="modal-box">
+    <button
+      type="button"
+      class="modal-close"
+      id="how-it-works-modal-close"
+      aria-label="Close"
+    >
+      &times;
+    </button>
+    <div class="modal-video-wrap">
+      <iframe
+        id="how-it-works-modal-iframe"
+        src=""
+        title="How Spendly works"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
+      ></iframe>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block scripts %}
+<script>
+  (function () {
+    var YOUTUBE_EMBED_URL = "https://www.youtube.com/embed/0rb7MM2Vd2Q";
+
+    var trigger = document.getElementById("how-it-works-btn");
+    var modal = document.getElementById("how-it-works-modal");
+    var iframe = document.getElementById("how-it-works-modal-iframe");
+    var closeBtn = document.getElementById("how-it-works-modal-close");
+
+    function openModal(event) {
+      event.preventDefault();
+      iframe.src = YOUTUBE_EMBED_URL + "?autoplay=1";
+      modal.hidden = false;
+    }
+
+    function closeModal() {
+      modal.hidden = true;
+      iframe.src = "";
+    }
+
+    trigger.addEventListener("click", openModal);
+    closeBtn.addEventListener("click", closeModal);
+    modal.addEventListener("click", function (event) {
+      if (event.target === modal) closeModal();
+    });
+  })();
+</script>
 {% endblock %}
