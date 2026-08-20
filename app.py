@@ -60,7 +60,7 @@ def register():
 def login():
     if request.method == "GET":
         if session.get("user_id"):
-            return redirect(url_for("landing"))
+            return redirect(url_for("profile"))
         return render_template("login.html")
 
     if request.method == "POST":
@@ -74,8 +74,7 @@ def login():
 
         session["user_id"] = user["id"]
         session["user_initials"] = "".join(part[0] for part in user["name"].split()[:2]).upper()
-        flash(f"Welcome back, {user['name']}.", "success")
-        return redirect(url_for("landing"))
+        return redirect(url_for("profile"))
 
     abort(405)
 
@@ -103,7 +102,52 @@ def privacy():
 
 @app.route("/profile")
 def profile():
-    return "Profile page — coming in Step 4"
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    # Step 4 = static UI. Step 5 replaces these literals with real queries
+    # scoped to session["user_id"]; key names/shapes stay stable so
+    # profile.html needs no changes when that happens.
+    user = {
+        "name": "Demo User",
+        "email": "demo@spendly.com",
+        "member_since": "November 2025",
+    }
+
+    stats = {
+        "total_spent": 384.21,
+        "transaction_count": 8,
+        "top_category": "Bills",
+    }
+
+    transactions = [
+        {"date": "Aug 20, 2026", "description": "Miscellaneous purchase", "category": "Other", "amount": 15.00},
+        {"date": "Aug 17, 2026", "description": "Dinner at restaurant", "category": "Food", "amount": 47.60},
+        {"date": "Aug 14, 2026", "description": "New running shoes", "category": "Shopping", "amount": 65.99},
+        {"date": "Aug 11, 2026", "description": "Movie tickets", "category": "Entertainment", "amount": 28.00},
+        {"date": "Aug 8, 2026", "description": "Pharmacy purchase", "category": "Health", "amount": 22.15},
+        {"date": "Aug 5, 2026", "description": "Electricity bill", "category": "Bills", "amount": 112.40},
+        {"date": "Aug 4, 2026", "description": "Gas fill-up", "category": "Transport", "amount": 38.75},
+        {"date": "Aug 2, 2026", "description": "Weekly groceries", "category": "Food", "amount": 54.32},
+    ]
+
+    categories = [
+        {"name": "Bills", "amount": 112.40},
+        {"name": "Food", "amount": 101.92},
+        {"name": "Shopping", "amount": 65.99},
+        {"name": "Transport", "amount": 38.75},
+        {"name": "Entertainment", "amount": 28.00},
+        {"name": "Health", "amount": 22.15},
+        {"name": "Other", "amount": 15.00},
+    ]
+
+    return render_template(
+        "profile.html",
+        user=user,
+        stats=stats,
+        transactions=transactions,
+        categories=categories,
+    )
 
 
 @app.route("/expenses/add")
