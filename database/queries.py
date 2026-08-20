@@ -8,6 +8,14 @@ from datetime import datetime
 from database.db import get_db
 
 
+def _date_filter_clause(date_from, date_to):
+    """Returns (sql_fragment, params_tuple) for an optional inclusive date
+    range. Both bounds must be provided for the filter to apply."""
+    if date_from is not None and date_to is not None:
+        return " AND date BETWEEN ? AND ?", (date_from, date_to)
+    return "", ()
+
+
 def get_user_by_id(user_id):
     """Returns dict with name, email, member_since ("Month YYYY", derived
     from users.created_at), or None if no such user."""
@@ -24,36 +32,39 @@ def get_user_by_id(user_id):
     return {"name": row["name"], "email": row["email"], "member_since": created.strftime("%B %Y")}
 
 
-def get_summary_stats(user_id):
+def get_summary_stats(user_id, date_from=None, date_to=None):
     """Returns dict with total_spent, transaction_count, top_category.
     No expenses -> {"total_spent": 0, "transaction_count": 0, "top_category": "—"}."""
+    clause, date_params = _date_filter_clause(date_from, date_to)
     conn = get_db()
     try:
         totals = conn.execute(
-            "SELECT COALESCE(SUM(amount), 0) AS total, COUNT(*) AS cnt FROM expenses WHERE user_id = ?",
-            (user_id,),
+            "SELECT COALESCE(SUM(amount), 0) AS total, COUNT(*) AS cnt FROM expenses "
+            "WHERE user_id = ?" + clause,
+            (user_id, *date_params),
         ).fetchone()
         if totals["cnt"] == 0:
             return {"total_spent": 0, "transaction_count": 0, "top_category": "—"}
         top = conn.execute(
-            "SELECT category, SUM(amount) AS cat_total FROM expenses WHERE user_id = ? "
-            "GROUP BY category ORDER BY cat_total DESC, category ASC LIMIT 1",
-            (user_id,),
+            "SELECT category, SUM(amount) AS cat_total FROM expenses WHERE user_id = ?"
+            + clause + " GROUP BY category ORDER BY cat_total DESC, category ASC LIMIT 1",
+            (user_id, *date_params),
         ).fetchone()
     finally:
         conn.close()
     return {"total_spent": round(totals["total"], 2), "transaction_count": totals["cnt"], "top_category": top["category"]}
 
 
-def get_recent_transactions(user_id, limit=10):
+def get_recent_transactions(user_id, limit=10, date_from=None, date_to=None):
     """Returns list of dicts (date, description, category, amount), newest
     first. No expenses -> []."""
+    clause, date_params = _date_filter_clause(date_from, date_to)
     conn = get_db()
     try:
         rows = conn.execute(
             "SELECT date, description, category, amount FROM expenses "
-            "WHERE user_id = ? ORDER BY date DESC, id DESC LIMIT ?",
-            (user_id, limit),
+            "WHERE user_id = ?" + clause + " ORDER BY date DESC, id DESC LIMIT ?",
+            (user_id, *date_params, limit),
         ).fetchall()
     finally:
         conn.close()
@@ -69,16 +80,17 @@ def get_recent_transactions(user_id, limit=10):
     return transactions
 
 
-def get_category_breakdown(user_id):
+def get_category_breakdown(user_id, date_from=None, date_to=None):
     """Returns list of dicts (name, amount, pct), ordered by amount desc.
     pct values are ints summing to 100 (largest category absorbs rounding
     remainder). No expenses -> []."""
+    clause, date_params = _date_filter_clause(date_from, date_to)
     conn = get_db()
     try:
         rows = conn.execute(
-            "SELECT category, SUM(amount) AS total FROM expenses WHERE user_id = ? "
-            "GROUP BY category ORDER BY total DESC, category ASC",
-            (user_id,),
+            "SELECT category, SUM(amount) AS total FROM expenses WHERE user_id = ?"
+            + clause + " GROUP BY category ORDER BY total DESC, category ASC",
+            (user_id, *date_params),
         ).fetchall()
     finally:
         conn.close()

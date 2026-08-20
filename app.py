@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import date, datetime
 
 from flask import Flask, abort, flash, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash
@@ -106,6 +107,32 @@ def privacy():
 # Placeholder routes — students will implement these                  #
 # ------------------------------------------------------------------ #
 
+def _shift_months_back(d, months):
+    """Returns the first of the month `months` calendar months before d."""
+    month_index = d.month - 1 - months
+    year = d.year + month_index // 12
+    month = month_index % 12 + 1
+    return date(year, month, 1)
+
+
+def _date_presets(today):
+    return {
+        "this_month": (today.replace(day=1).isoformat(), today.isoformat()),
+        "last_3_months": (_shift_months_back(today, 2).isoformat(), today.isoformat()),
+        "last_6_months": (_shift_months_back(today, 5).isoformat(), today.isoformat()),
+    }
+
+
+def _parse_date_arg(raw_value):
+    if not raw_value:
+        return None
+    try:
+        datetime.strptime(raw_value, "%Y-%m-%d")
+    except ValueError:
+        return None
+    return raw_value
+
+
 @app.route("/profile")
 def profile():
     if not session.get("user_id"):
@@ -117,9 +144,27 @@ def profile():
         session.clear()
         return redirect(url_for("login"))
 
-    stats = get_summary_stats(user_id)
-    transactions = get_recent_transactions(user_id)
-    categories = get_category_breakdown(user_id)
+    date_from = _parse_date_arg(request.args.get("date_from"))
+    date_to = _parse_date_arg(request.args.get("date_to"))
+
+    if date_from is not None and date_to is not None and date_from > date_to:
+        date_from, date_to = None, None
+        flash("Start date must be before end date.", "error")
+
+    presets = _date_presets(date.today())
+
+    active_preset = None
+    if date_from is None and date_to is None:
+        active_preset = "all_time"
+    else:
+        for name, (preset_from, preset_to) in presets.items():
+            if date_from == preset_from and date_to == preset_to:
+                active_preset = name
+                break
+
+    stats = get_summary_stats(user_id, date_from=date_from, date_to=date_to)
+    transactions = get_recent_transactions(user_id, date_from=date_from, date_to=date_to)
+    categories = get_category_breakdown(user_id, date_from=date_from, date_to=date_to)
 
     return render_template(
         "profile.html",
@@ -127,6 +172,10 @@ def profile():
         stats=stats,
         transactions=transactions,
         categories=categories,
+        date_from=date_from,
+        date_to=date_to,
+        active_preset=active_preset,
+        presets=presets,
     )
 
 

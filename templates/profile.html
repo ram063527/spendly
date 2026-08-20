@@ -19,6 +19,31 @@
             </div>
         </div>
 
+        <div class="profile-filter-bar">
+            <nav class="profile-filter-presets" aria-label="Date range presets">
+                <a href="{{ url_for('profile', date_from=presets.this_month[0], date_to=presets.this_month[1]) }}"
+                   class="profile-filter-link{% if active_preset == 'this_month' %} active{% endif %}">This Month</a>
+                <a href="{{ url_for('profile', date_from=presets.last_3_months[0], date_to=presets.last_3_months[1]) }}"
+                   class="profile-filter-link{% if active_preset == 'last_3_months' %} active{% endif %}">Last 3 Months</a>
+                <a href="{{ url_for('profile', date_from=presets.last_6_months[0], date_to=presets.last_6_months[1]) }}"
+                   class="profile-filter-link{% if active_preset == 'last_6_months' %} active{% endif %}">Last 6 Months</a>
+                <a href="{{ url_for('profile') }}"
+                   class="profile-filter-link{% if active_preset == 'all_time' %} active{% endif %}">All Time</a>
+            </nav>
+            <form class="profile-filter-form{% if not active_preset and (date_from or date_to) %} active{% endif %}"
+                  method="GET" action="{{ url_for('profile') }}">
+                <label class="profile-filter-form-field">
+                    <span>From</span>
+                    <input type="date" name="date_from" value="{{ date_from or '' }}">
+                </label>
+                <label class="profile-filter-form-field">
+                    <span>To</span>
+                    <input type="date" name="date_to" value="{{ date_to or '' }}">
+                </label>
+                <button type="submit" class="profile-filter-apply">Apply</button>
+            </form>
+        </div>
+
         <div class="profile-stats-row">
             <div class="profile-stat">
                 <span class="profile-stat-label">Total Spent</span>
