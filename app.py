@@ -1,3 +1,4 @@
+import math
 import sqlite3
 from datetime import date, datetime
 
@@ -10,10 +11,13 @@ from database.queries import (
     get_recent_transactions,
     get_summary_stats,
     get_user_by_id,
+    insert_expense,
 )
 
 app = Flask(__name__)
 app.secret_key = "spendly-dev-secret-key"
+
+EXPENSE_CATEGORIES = ["Food", "Transport", "Bills", "Health", "Entertainment", "Shopping", "Other"]
 
 with app.app_context():
     init_db()
@@ -186,9 +190,49 @@ def profile():
     )
 
 
-@app.route("/expenses/add")
+@app.route("/expenses/add", methods=["GET", "POST"])
 def add_expense():
-    return "Add expense — coming in Step 7"
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    user_id = session["user_id"]
+    today = date.today().isoformat()
+
+    def render_form():
+        return render_template("add_expense.html", categories=EXPENSE_CATEGORIES, today=today)
+
+    if request.method == "GET":
+        return render_form()
+
+    if request.method == "POST":
+        amount_raw = request.form.get("amount", "").strip()
+        category = request.form.get("category", "").strip()
+        date_raw = request.form.get("date", "").strip()
+        description = request.form.get("description", "").strip()[:200]
+
+        try:
+            amount = float(amount_raw)
+            if not math.isfinite(amount) or amount <= 0:
+                raise ValueError
+        except ValueError:
+            flash("Enter a valid amount greater than 0.", "error")
+            return render_form()
+
+        if category not in EXPENSE_CATEGORIES:
+            flash("Select a valid category.", "error")
+            return render_form()
+
+        try:
+            datetime.strptime(date_raw, "%Y-%m-%d")
+        except ValueError:
+            flash("Enter a valid date.", "error")
+            return render_form()
+
+        insert_expense(user_id, amount, category, date_raw, description or None)
+        flash("Expense added.", "success")
+        return redirect(url_for("profile"))
+
+    abort(405)
 
 
 @app.route("/expenses/<int:id>/edit")
