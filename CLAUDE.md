@@ -54,22 +54,6 @@ spendly/
 
 ---
 
-## Subagent Policy
-
-- Always use a builtin explore subagent for codebase exploration
-  before implementing any new feature
-- Always use a subagent to verify test results
-  after any implementation
-- When asked to plan, delegate codebase research
-  to a subagent before presenting the plan
-- always use a builtin plan subagent in plan mode
-- Always use the `test-writer` subagent to generate pytest tests
-  after implementing any feature — it writes tests from the feature's
-  spec file, not from the implementation, so it must run before any
-  test-verification subagent
-
----
-
 ## Commands
 
 ```bash
@@ -98,17 +82,17 @@ pytest -s
 
 ## Implemented vs stub routes
 
-| Route                       | Status                                |
-| --------------------------- | ------------------------------------- |
-| `GET /`                     | Implemented — renders `landing.html`  |
-| `GET /register`             | Implemented — renders `register.html` |
-| `GET /login`                | Implemented — renders `login.html`, redirects to `/` if already signed in |
-| `POST /login`               | Implemented — verifies credentials, starts session, redirects to `/` |
-| `GET /logout`                | Implemented — clears session, redirects to `/` |
+| Route                       | Status                                                                                                                                                               |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /`                     | Implemented — renders `landing.html`                                                                                                                                 |
+| `GET /register`             | Implemented — renders `register.html`                                                                                                                                |
+| `GET /login`                | Implemented — renders `login.html`, redirects to `/` if already signed in                                                                                            |
+| `POST /login`               | Implemented — verifies credentials, starts session, redirects to `/`                                                                                                 |
+| `GET /logout`               | Implemented — clears session, redirects to `/`                                                                                                                       |
 | `GET /profile`              | Partially implemented — UI wired and auth-gated, but `user`/`stats`/`transactions`/`categories` are still hardcoded in `app.py`; wiring to real DB queries is Step 5 |
-| `GET /expenses/add`         | Stub — Step 7                         |
-| `GET /expenses/<id>/edit`   | Stub — Step 8                         |
-| `GET /expenses/<id>/delete` | Stub — Step 9                         |
+| `GET /expenses/add`         | Stub — Step 7                                                                                                                                                        |
+| `GET /expenses/<id>/edit`   | Stub — Step 8                                                                                                                                                        |
+| `GET /expenses/<id>/delete` | Stub — Step 9                                                                                                                                                        |
 
 **Do not implement a stub route unless the active task explicitly targets that step.**
 
