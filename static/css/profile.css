@@ -224,6 +224,17 @@
     margin: 0 0 1.5rem;
 }
 
+.profile-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.profile-card-header .profile-card-title {
+    margin-bottom: 0;
+}
+
 /* ------------------------------------------------------------------ */
 /* Transaction history table                                           */
 /* ------------------------------------------------------------------ */

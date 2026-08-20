@@ -100,3 +100,18 @@ def get_category_breakdown(user_id, date_from=None, date_to=None):
     pcts = [round(r["total"] / grand_total * 100) for r in rows]
     pcts[0] += 100 - sum(pcts)  # largest category absorbs the rounding remainder
     return [{"name": r["category"], "amount": round(r["total"], 2), "pct": p} for r, p in zip(rows, pcts)]
+
+
+def insert_expense(user_id, amount, category, expense_date, description):
+    """Inserts a new expense row and returns its new id."""
+    conn = get_db()
+    try:
+        cursor = conn.execute(
+            "INSERT INTO expenses (user_id, amount, category, date, description) "
+            "VALUES (?, ?, ?, ?, ?)",
+            (user_id, amount, category, expense_date, description),
+        )
+        conn.commit()
+        return cursor.lastrowid
+    finally:
+        conn.close()

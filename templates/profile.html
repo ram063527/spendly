@@ -60,7 +60,10 @@
         </div>
 
         <div class="profile-card">
-            <h2 class="profile-card-title">Transaction History</h2>
+            <div class="profile-card-header">
+                <h2 class="profile-card-title">Transaction History</h2>
+                <a href="{{ url_for('add_expense') }}" class="btn-primary">Add Expense</a>
+            </div>
             <div class="profile-table-wrap">
                 <table class="profile-table">
                     <caption class="sr-only">Recent transactions</caption>
