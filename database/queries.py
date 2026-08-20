@@ -1,0 +1,90 @@
+"""Pure query helpers for the profile page. No Flask imports — callers
+(routes) pass in a user_id and get back plain dicts/lists. Each function
+opens its own connection via get_db() and closes it before returning,
+matching the convention in database/db.py."""
+
+from datetime import datetime
+
+from database.db import get_db
+
+
+def get_user_by_id(user_id):
+    """Returns dict with name, email, member_since ("Month YYYY", derived
+    from users.created_at), or None if no such user."""
+    conn = get_db()
+    try:
+        row = conn.execute(
+            "SELECT name, email, created_at FROM users WHERE id = ?", (user_id,)
+        ).fetchone()
+    finally:
+        conn.close()
+    if row is None:
+        return None
+    created = datetime.strptime(row["created_at"], "%Y-%m-%d %H:%M:%S")
+    return {"name": row["name"], "email": row["email"], "member_since": created.strftime("%B %Y")}
+
+
+def get_summary_stats(user_id):
+    """Returns dict with total_spent, transaction_count, top_category.
+    No expenses -> {"total_spent": 0, "transaction_count": 0, "top_category": "—"}."""
+    conn = get_db()
+    try:
+        totals = conn.execute(
+            "SELECT COALESCE(SUM(amount), 0) AS total, COUNT(*) AS cnt FROM expenses WHERE user_id = ?",
+            (user_id,),
+        ).fetchone()
+        if totals["cnt"] == 0:
+            return {"total_spent": 0, "transaction_count": 0, "top_category": "—"}
+        top = conn.execute(
+            "SELECT category, SUM(amount) AS cat_total FROM expenses WHERE user_id = ? "
+            "GROUP BY category ORDER BY cat_total DESC, category ASC LIMIT 1",
+            (user_id,),
+        ).fetchone()
+    finally:
+        conn.close()
+    return {"total_spent": round(totals["total"], 2), "transaction_count": totals["cnt"], "top_category": top["category"]}
+
+
+def get_recent_transactions(user_id, limit=10):
+    """Returns list of dicts (date, description, category, amount), newest
+    first. No expenses -> []."""
+    conn = get_db()
+    try:
+        rows = conn.execute(
+            "SELECT date, description, category, amount FROM expenses "
+            "WHERE user_id = ? ORDER BY date DESC, id DESC LIMIT ?",
+            (user_id, limit),
+        ).fetchall()
+    finally:
+        conn.close()
+    transactions = []
+    for row in rows:
+        d = datetime.strptime(row["date"], "%Y-%m-%d")
+        transactions.append({
+            "date": f"{d.strftime('%b')} {d.day}, {d.year}",
+            "description": row["description"],
+            "category": row["category"],
+            "amount": round(row["amount"], 2),
+        })
+    return transactions
+
+
+def get_category_breakdown(user_id):
+    """Returns list of dicts (name, amount, pct), ordered by amount desc.
+    pct values are ints summing to 100 (largest category absorbs rounding
+    remainder). No expenses -> []."""
+    conn = get_db()
+    try:
+        rows = conn.execute(
+            "SELECT category, SUM(amount) AS total FROM expenses WHERE user_id = ? "
+            "GROUP BY category ORDER BY total DESC, category ASC",
+            (user_id,),
+        ).fetchall()
+    finally:
+        conn.close()
+    if not rows:
+        return []
+    grand_total = sum(r["total"] for r in rows)
+    pcts = [round(r["total"] / grand_total * 100) for r in rows]
+    pcts[0] += 100 - sum(pcts)  # largest category absorbs the rounding remainder
+    return [{"name": r["category"], "amount": round(r["total"], 2), "pct": p} for r, p in zip(rows, pcts)]

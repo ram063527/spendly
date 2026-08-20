@@ -22,7 +22,7 @@
         <div class="profile-stats-row">
             <div class="profile-stat">
                 <span class="profile-stat-label">Total Spent</span>
-                <span class="profile-stat-value accent">${{ "%.2f"|format(stats.total_spent) }}</span>
+                <span class="profile-stat-value accent">₹{{ "%.2f"|format(stats.total_spent) }}</span>
             </div>
             <div class="profile-stat">
                 <span class="profile-stat-label">Transactions</span>
@@ -55,7 +55,7 @@
                             <td>
                                 <span class="category-badge category-badge--{{ txn.category|lower }}">{{ txn.category }}</span>
                             </td>
-                            <td class="amount-cell">${{ "%.2f"|format(txn.amount) }}</td>
+                            <td class="amount-cell">₹{{ "%.2f"|format(txn.amount) }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -66,15 +66,17 @@
         <div class="profile-card">
             <h2 class="profile-card-title">Category Breakdown</h2>
             {% for cat in categories %}
+            {% set bar_step = (cat.pct // 5) * 5 %}
+            {% if bar_step == 0 %}{% set bar_step = 5 %}{% endif %}
             <div class="profile-cat-row">
                 <div class="profile-cat-name">
                     <span class="profile-cat-dot profile-cat-dot--{{ cat.name|lower }}"></span>
                     {{ cat.name }}
                 </div>
                 <div class="profile-cat-bar">
-                    <div class="profile-cat-fill profile-cat-fill--{{ cat.name|lower }}"></div>
+                    <div class="profile-cat-fill profile-cat-fill--{{ cat.name|lower }} w-{{ bar_step }}"></div>
                 </div>
-                <span class="profile-cat-amount">${{ "%.2f"|format(cat.amount) }}</span>
+                <span class="profile-cat-amount">₹{{ "%.2f"|format(cat.amount) }}</span>
             </div>
             {% endfor %}
         </div>
