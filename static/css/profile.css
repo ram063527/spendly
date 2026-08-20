@@ -248,16 +248,34 @@
     transition: width 0.6s ease;
 }
 
-/* Width is baked into these modifiers (not an inline style) since Step 4's
-   percentages are static. Step 5's real per-user percentages will need a
-   small set of --w-<n> step classes instead of one-per-category. */
-.profile-cat-fill--bills { background: var(--cat-bills); width: 29%; }
-.profile-cat-fill--food { background: var(--cat-food); width: 27%; }
-.profile-cat-fill--shopping { background: var(--cat-shopping); width: 17%; }
-.profile-cat-fill--transport { background: var(--cat-transport); width: 10%; }
-.profile-cat-fill--entertainment { background: var(--cat-entertainment); width: 7%; }
-.profile-cat-fill--health { background: var(--cat-health); width: 6%; }
-.profile-cat-fill--other { background: var(--ink-muted); width: 4%; }
+.profile-cat-fill--bills { background: var(--cat-bills); }
+.profile-cat-fill--food { background: var(--cat-food); }
+.profile-cat-fill--shopping { background: var(--cat-shopping); }
+.profile-cat-fill--transport { background: var(--cat-transport); }
+.profile-cat-fill--entertainment { background: var(--cat-entertainment); }
+.profile-cat-fill--health { background: var(--cat-health); }
+.profile-cat-fill--other { background: var(--ink-muted); }
+
+.w-5 { width: 5%; }
+.w-10 { width: 10%; }
+.w-15 { width: 15%; }
+.w-20 { width: 20%; }
+.w-25 { width: 25%; }
+.w-30 { width: 30%; }
+.w-35 { width: 35%; }
+.w-40 { width: 40%; }
+.w-45 { width: 45%; }
+.w-50 { width: 50%; }
+.w-55 { width: 55%; }
+.w-60 { width: 60%; }
+.w-65 { width: 65%; }
+.w-70 { width: 70%; }
+.w-75 { width: 75%; }
+.w-80 { width: 80%; }
+.w-85 { width: 85%; }
+.w-90 { width: 90%; }
+.w-95 { width: 95%; }
+.w-100 { width: 100%; }
 
 .profile-cat-amount {
     text-align: right;
