@@ -146,3 +146,18 @@ def update_expense(expense_id, user_id, amount, category, expense_date, descript
         conn.commit()
     finally:
         conn.close()
+
+
+def remove_expense(expense_id, user_id):
+    """Deletes an expense row, scoped to both id and user_id so a user can
+    never delete another user's expense. A non-existent id or mismatched
+    user_id simply affects 0 rows — no error is raised."""
+    conn = get_db()
+    try:
+        conn.execute(
+            "DELETE FROM expenses WHERE id = ? AND user_id = ?",
+            (expense_id, user_id),
+        )
+        conn.commit()
+    finally:
+        conn.close()

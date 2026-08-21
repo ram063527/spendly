@@ -16,6 +16,8 @@
     --accent-2-light: #fdf3e3;
     --danger: #c0392b;
     --danger-light: #fdecea;
+    --info: #2563eb;
+    --info-light: #eaf1fd;
 
     --cat-food: #7a6a2f;
     --cat-food-light: #f1ede0;
@@ -371,6 +373,25 @@ a { color: inherit; text-decoration: none; }
 }
 
 .btn-ghost:hover { background: var(--accent); }
+
+.btn-action {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.btn-edit { background: var(--info); color: var(--paper-card); }
+.btn-edit:hover { background: var(--info-light); color: var(--info); }
+
+.btn-delete { background: var(--danger); color: var(--paper-card); }
+.btn-delete:hover { background: var(--danger-light); color: var(--danger); }
 
 /* ------------------------------------------------------------------ */
 /* Features section                                                    */
