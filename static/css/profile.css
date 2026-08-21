@@ -270,6 +270,11 @@
     text-align: right;
 }
 
+.profile-table thead th.amount-col,
+.profile-table tbody td.amount-cell {
+    padding-right: clamp(1.5rem, 4vw, 3rem);
+}
+
 .profile-table tbody td {
     padding: 0.9rem 0;
     border-bottom: 1px solid var(--border-soft);
@@ -287,16 +292,10 @@
     font-variant-numeric: tabular-nums;
 }
 
-.profile-action-link {
-    color: var(--ink-muted);
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.profile-action-link:hover {
-    color: var(--accent);
-    text-decoration: underline;
+.profile-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
 }
 
 /* ------------------------------------------------------------------ */
