@@ -7,7 +7,7 @@ def test_get_recent_transactions_with_expenses(seeded_user):
     assert txns[0]["date"] == "Aug 20, 2026"       # newest first
     assert txns[-1]["date"] == "Aug 2, 2026"        # oldest last, no leading zero
     for t in txns:
-        assert set(t.keys()) == {"date", "description", "category", "amount"}
+        assert set(t.keys()) == {"id", "date", "description", "category", "amount"}
 
 
 def test_get_recent_transactions_empty(empty_user):

@@ -30,7 +30,7 @@ running code review."
 
 Invoke both subagents simultaneously with the same
 context:
-
+0
 **spendly-security-reviewer** receives:
 
 - The combined diff from the pre-flight check
