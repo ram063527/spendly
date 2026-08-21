@@ -62,7 +62,7 @@ def get_recent_transactions(user_id, limit=10, date_from=None, date_to=None):
     conn = get_db()
     try:
         rows = conn.execute(
-            "SELECT date, description, category, amount FROM expenses "
+            "SELECT id, date, description, category, amount FROM expenses "
             "WHERE user_id = ?" + clause + " ORDER BY date DESC, id DESC LIMIT ?",
             (user_id, *date_params, limit),
         ).fetchall()
@@ -72,6 +72,7 @@ def get_recent_transactions(user_id, limit=10, date_from=None, date_to=None):
     for row in rows:
         d = datetime.strptime(row["date"], "%Y-%m-%d")
         transactions.append({
+            "id": row["id"],
             "date": f"{d.strftime('%b')} {d.day}, {d.year}",
             "description": row["description"],
             "category": row["category"],
@@ -113,5 +114,35 @@ def insert_expense(user_id, amount, category, expense_date, description):
         )
         conn.commit()
         return cursor.lastrowid
+    finally:
+        conn.close()
+
+
+def get_expense_by_id(expense_id, user_id):
+    """Returns a dict (id, amount, category, date, description) if the
+    expense exists and belongs to user_id, else None."""
+    conn = get_db()
+    try:
+        row = conn.execute(
+            "SELECT id, amount, category, date, description FROM expenses "
+            "WHERE id = ? AND user_id = ?",
+            (expense_id, user_id),
+        ).fetchone()
+    finally:
+        conn.close()
+    return dict(row) if row else None
+
+
+def update_expense(expense_id, user_id, amount, category, expense_date, description):
+    """Updates an existing expense row, scoped to both id and user_id so a
+    user can never modify another user's expense."""
+    conn = get_db()
+    try:
+        conn.execute(
+            "UPDATE expenses SET amount = ?, category = ?, date = ?, description = ? "
+            "WHERE id = ? AND user_id = ?",
+            (amount, category, expense_date, description, expense_id, user_id),
+        )
+        conn.commit()
     finally:
         conn.close()

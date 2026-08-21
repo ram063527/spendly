@@ -73,6 +73,7 @@
                             <th scope="col">Description</th>
                             <th scope="col">Category</th>
                             <th scope="col" class="amount-col">Amount</th>
+                            <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -84,6 +85,7 @@
                                 <span class="category-badge category-badge--{{ txn.category|lower }}">{{ txn.category }}</span>
                             </td>
                             <td class="amount-cell">₹{{ "%.2f"|format(txn.amount) }}</td>
+                            <td><a href="{{ url_for('edit_expense', id=txn.id) }}" class="profile-action-link">Edit</a></td>
                         </tr>
                         {% endfor %}
                     </tbody>

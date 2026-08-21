@@ -8,10 +8,12 @@ from werkzeug.security import check_password_hash
 from database.db import create_user, get_db, get_user_by_email, init_db, seed_db
 from database.queries import (
     get_category_breakdown,
+    get_expense_by_id,
     get_recent_transactions,
     get_summary_stats,
     get_user_by_id,
     insert_expense,
+    update_expense,
 )
 
 app = Flask(__name__)
@@ -190,6 +192,32 @@ def profile():
     )
 
 
+def _parse_expense_form(form):
+    """Validates the add/edit expense form fields. Returns (expense_dict, error_message);
+    error_message is None on success."""
+    amount_raw = form.get("amount", "").strip()
+    category = form.get("category", "").strip()
+    date_raw = form.get("date", "").strip()
+    description = form.get("description", "").strip()[:200]
+
+    try:
+        amount = float(amount_raw)
+        if not math.isfinite(amount) or amount <= 0:
+            raise ValueError
+    except ValueError:
+        return None, "Enter a valid amount greater than 0."
+
+    if category not in EXPENSE_CATEGORIES:
+        return None, "Select a valid category."
+
+    try:
+        datetime.strptime(date_raw, "%Y-%m-%d")
+    except ValueError:
+        return None, "Enter a valid date."
+
+    return {"amount": amount, "category": category, "date": date_raw, "description": description or None}, None
+
+
 @app.route("/expenses/add", methods=["GET", "POST"])
 def add_expense():
     if not session.get("user_id"):
@@ -205,39 +233,48 @@ def add_expense():
         return render_form()
 
     if request.method == "POST":
-        amount_raw = request.form.get("amount", "").strip()
-        category = request.form.get("category", "").strip()
-        date_raw = request.form.get("date", "").strip()
-        description = request.form.get("description", "").strip()[:200]
-
-        try:
-            amount = float(amount_raw)
-            if not math.isfinite(amount) or amount <= 0:
-                raise ValueError
-        except ValueError:
-            flash("Enter a valid amount greater than 0.", "error")
+        expense, error = _parse_expense_form(request.form)
+        if error:
+            flash(error, "error")
             return render_form()
 
-        if category not in EXPENSE_CATEGORIES:
-            flash("Select a valid category.", "error")
-            return render_form()
-
-        try:
-            datetime.strptime(date_raw, "%Y-%m-%d")
-        except ValueError:
-            flash("Enter a valid date.", "error")
-            return render_form()
-
-        insert_expense(user_id, amount, category, date_raw, description or None)
+        insert_expense(user_id, expense["amount"], expense["category"], expense["date"], expense["description"])
         flash("Expense added.", "success")
         return redirect(url_for("profile"))
 
     abort(405)
 
 
-@app.route("/expenses/<int:id>/edit")
+@app.route("/expenses/<int:id>/edit", methods=["GET", "POST"])
 def edit_expense(id):
-    return "Edit expense — coming in Step 8"
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    user_id = session["user_id"]
+    expense = get_expense_by_id(id, user_id)
+    if expense is None:
+        abort(404)
+
+    def render_form():
+        return render_template("edit_expense.html", expense=expense, categories=EXPENSE_CATEGORIES)
+
+    if request.method == "GET":
+        return render_form()
+
+    if request.method == "POST":
+        expense_data, error = _parse_expense_form(request.form)
+        if error:
+            flash(error, "error")
+            return render_form()
+
+        update_expense(
+            id, user_id, expense_data["amount"], expense_data["category"],
+            expense_data["date"], expense_data["description"],
+        )
+        flash("Expense updated.", "success")
+        return redirect(url_for("profile"))
+
+    abort(405)
 
 
 @app.route("/expenses/<int:id>/delete")
